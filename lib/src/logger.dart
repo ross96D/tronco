@@ -2,6 +2,8 @@ import 'package:tronco/src/count.dart';
 import 'package:tronco/src/interfaces.dart';
 import 'package:tronco/src/types.dart';
 
+import 'types.dart';
+
 typedef LogEventHook = void Function(LogEvent);
 typedef LogOutputHook = void Function(OutputEvent);
 
@@ -108,6 +110,120 @@ class Logger {
       eventHooks: eventHooks,
       outputHooks: outputHooks,
       defaultProperties: properties ?? defaultProperties,
+    );
+  }
+
+  void trace(
+    String message, {
+    DateTime? time,
+    Object? error,
+    StackTrace? stackTrace,
+    List<LogEvent> childEvents = const [],
+    List<LogEventProperty> properties = const [],
+  }) {
+    return log(
+      Level.trace,
+      message,
+      time: time,
+      error: error,
+      stackTrace: stackTrace,
+      childEvents: childEvents,
+      properties: properties,
+    );
+  }
+
+  void debug(
+    String message, {
+    DateTime? time,
+    Object? error,
+    StackTrace? stackTrace,
+    List<LogEvent> childEvents = const [],
+    List<LogEventProperty> properties = const [],
+  }) {
+    return log(
+      Level.debug,
+      message,
+      time: time,
+      error: error,
+      stackTrace: stackTrace,
+      childEvents: childEvents,
+      properties: properties,
+    );
+  }
+
+  void info(
+    String message, {
+    DateTime? time,
+    Object? error,
+    StackTrace? stackTrace,
+    List<LogEvent> childEvents = const [],
+    List<LogEventProperty> properties = const [],
+  }) {
+    return log(
+      Level.info,
+      message,
+      time: time,
+      error: error,
+      stackTrace: stackTrace,
+      childEvents: childEvents,
+      properties: properties,
+    );
+  }
+
+  void warning(
+    String message, {
+    DateTime? time,
+    Object? error,
+    StackTrace? stackTrace,
+    List<LogEvent> childEvents = const [],
+    List<LogEventProperty> properties = const [],
+  }) {
+    return log(
+      Level.warning,
+      message,
+      time: time,
+      error: error,
+      stackTrace: stackTrace,
+      childEvents: childEvents,
+      properties: properties,
+    );
+  }
+
+  void error(
+    String message, {
+    DateTime? time,
+    Object? error,
+    StackTrace? stackTrace,
+    List<LogEvent> childEvents = const [],
+    List<LogEventProperty> properties = const [],
+  }) {
+    return log(
+      Level.error,
+      message,
+      time: time,
+      error: error,
+      stackTrace: stackTrace,
+      childEvents: childEvents,
+      properties: properties,
+    );
+  }
+
+  void fatal(
+    String message, {
+    DateTime? time,
+    Object? error,
+    StackTrace? stackTrace,
+    List<LogEvent> childEvents = const [],
+    List<LogEventProperty> properties = const [],
+  }) {
+    return log(
+      Level.fatal,
+      message,
+      time: time,
+      error: error,
+      stackTrace: stackTrace,
+      childEvents: childEvents,
+      properties: properties,
     );
   }
 }
