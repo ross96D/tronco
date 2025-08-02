@@ -21,7 +21,7 @@ enum Level {
 
 class LogEvent {
   final Level level;
-  final List<LogEventProperties> properties;
+  final List<LogEventProperty> properties;
   final String message;
   final Object? error;
   final StackTrace? stackTrace;
@@ -50,13 +50,13 @@ class OutputEvent {
   const OutputEvent(this.origin, this.lines);
 }
 
-abstract class LogEventProperties {
-  const LogEventProperties();
+abstract class LogEventProperty {
+  const LogEventProperty();
 
   String print();
 }
 
-class StringProperty extends LogEventProperties{
+class StringProperty extends LogEventProperty{
   final String value;
   const StringProperty(this.value);
 
@@ -67,7 +67,7 @@ class StringProperty extends LogEventProperties{
   String print() => toString();
 }
 
-class EntryProperty extends LogEventProperties {
+class EntryProperty extends LogEventProperty {
   final (String, String) value;
   const EntryProperty(String key, String value): value = (key, value);
 

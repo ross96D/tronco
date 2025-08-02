@@ -75,7 +75,7 @@ class ChildLogger extends Logger {
     DateTime? time,
     Object? error,
     StackTrace? stackTrace,
-    List<LogEventProperties> properties = const [],
+    List<LogEventProperty> properties = const [],
   }) {
     _start = LogEvent(
       level,
@@ -105,7 +105,7 @@ class ChildLogger extends Logger {
     DateTime? time,
     Object? error,
     StackTrace? stackTrace,
-    List<LogEventProperties> properties = const [],
+    List<LogEventProperty> properties = const [],
   }) {
     final event = LogEvent(
       level,
@@ -128,7 +128,7 @@ class ChildLogger extends Logger {
     Object? error,
     StackTrace? stackTrace,
     List<LogEvent> childEvents = const [],
-    List<LogEventProperties> properties = const [],
+    List<LogEventProperty> properties = const [],
   }) {
     throw AssertionError("ChildLogger does not use log function");
   }
@@ -137,12 +137,12 @@ class ChildLogger extends Logger {
 void main() async {
   final logger = Logger(
     filter: LevelFilter(Level.info),
-    printer: Printer(),
+    printer: NewLinePrinter(Printer()),
     output: ConsoleOutput(),
   );
   await logger.init();
 
-  logger.log(Level.info, "message");
+  logger.log(Level.info, "message\nmessage\nmessage");
 
   try {
     throw StateError("Test error");

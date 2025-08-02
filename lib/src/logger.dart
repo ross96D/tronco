@@ -27,7 +27,7 @@ class Logger {
   /// Functions to be called on every output log
   final List<LogOutputHook> outputHooks;
 
-  final List<LogEventProperties> defaultProperties;
+  final List<LogEventProperty> defaultProperties;
 
   Logger.raw({
     required this.filter,
@@ -44,7 +44,7 @@ class Logger {
     required LogOutput output,
     List<LogEventHook>? eventHooks,
     List<LogOutputHook>? outputHooks,
-    List<LogEventProperties>? properties,
+    List<LogEventProperty>? properties,
   }) : eventHooks = eventHooks ?? [],
        outputHooks = outputHooks ?? [],
        defaultProperties = properties ?? [],
@@ -67,7 +67,7 @@ class Logger {
     Object? error,
     StackTrace? stackTrace,
     List<LogEvent> childEvents = const [],
-    List<LogEventProperties> properties = const [],
+    List<LogEventProperty> properties = const [],
   }) {
     // if stackTrace is not null error should not be null
     assert(stackTrace == null || error != null);
@@ -100,7 +100,7 @@ class Logger {
 
   /// Returns a [Logger] already initialized with the values of the parent logger
   /// that wont trigger destroy calls
-  Logger clone({List<LogEventProperties>? properties}) {
+  Logger clone({List<LogEventProperty>? properties}) {
     return Logger.raw(
       filter: filter.clone(),
       printer: printer.clone(),

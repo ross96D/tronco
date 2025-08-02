@@ -25,6 +25,23 @@ class ConsoleOutput extends LogOutput {
   }
 }
 
+class NewLinePrinter extends LogPrinter {
+  final LogPrinter printer;
+  NewLinePrinter(this.printer);
+
+  @override
+  Future<void> init() => printer.init();
+
+  @override
+  Future<void> destroy() => printer.destroy();
+
+  @override
+  Iterable<String> log(LogEvent event) sync* {
+    yield* printer.log(event);
+    yield "";
+  }
+}
+
 /// Example implementation of a printer.
 /// Printer is meant to be implemented by the user,
 /// this implementation is purposely simple and not feature complete
