@@ -1,3 +1,4 @@
+import 'package:tronco/src/count.dart';
 import 'package:tronco/src/interfaces.dart';
 import 'package:tronco/src/types.dart';
 
@@ -6,13 +7,19 @@ typedef LogOutputHook = void Function(OutputEvent);
 
 class Logger {
   /// Decides wheter a messasge would be logged or not
-  final LogFilter filter;
+  ///
+  /// This uses a ref count strategy to know when to call destroy or init
+  final Rc<LogFilter> filter;
 
   /// Takes a log event and returns the lines that would be printed
-  final LogPrinter printer;
+  ///
+  /// This uses a ref count strategy to know when to call destroy or init
+  final Rc<LogPrinter> printer;
 
   /// Write the lines received from the printer
-  final LogOutput output;
+  ///
+  /// This uses a ref count strategy to know when to call destroy or init
+  final Rc<LogOutput> output;
 
   /// Functions to be called on every event log, before filters
   final List<LogEventHook> eventHooks;
@@ -20,14 +27,30 @@ class Logger {
   /// Functions to be called on every output log
   final List<LogOutputHook> outputHooks;
 
-  Logger({
+  final List<LogEventProperties> defaultProperties;
+
+  Logger.raw({
     required this.filter,
     required this.printer,
     required this.output,
+    required this.eventHooks,
+    required this.outputHooks,
+    required this.defaultProperties,
+  });
+
+  Logger({
+    required LogFilter filter,
+    required LogPrinter printer,
+    required LogOutput output,
     List<LogEventHook>? eventHooks,
     List<LogOutputHook>? outputHooks,
+    List<LogEventProperties>? properties,
   }) : eventHooks = eventHooks ?? [],
-       outputHooks = outputHooks ?? [];
+       outputHooks = outputHooks ?? [],
+       defaultProperties = properties ?? [],
+       filter = Rc.create(filter),
+       printer = Rc.create(printer),
+       output = Rc.create(output);
 
   Future<void> init() async {
     await Future.wait([filter.init(), printer.init(), output.init()]);
@@ -40,62 +63,51 @@ class Logger {
   void log(
     Level level,
     String message, {
-    List<LogEventProperties> properties = const [],
     DateTime? time,
     Object? error,
     StackTrace? stackTrace,
+    List<LogEvent> childEvents = const [],
+    List<LogEventProperties> properties = const [],
   }) {
     // if stackTrace is not null error should not be null
     assert(stackTrace == null || error != null);
     final event = LogEvent(
       level,
       message,
-      properties: properties,
+      time: time,
       error: error,
       stackTrace: stackTrace,
-      time: time,
+      properties: List.from(defaultProperties)..addAll(properties),
+      childEvents: childEvents,
     );
     for (final hook in eventHooks) {
       hook(event);
     }
 
-    if (!filter.shouldLog(event)) {
+    if (!filter.value.shouldLog(event)) {
       return;
     }
 
-    final lines = printer.log(event);
+    final lines = printer.value.log(event);
 
     final outputEvent = OutputEvent(event, lines);
 
-    output.output(outputEvent);
+    output.value.output(outputEvent);
     for (var hook in outputHooks) {
       hook(outputEvent);
     }
   }
 
-  Logger createChild() {
-    return _ChildLogger(
-      filter: filter,
-      printer: printer,
-      output: output,
+  /// Returns a [Logger] already initialized with the values of the parent logger
+  /// that wont trigger destroy calls
+  Logger clone({List<LogEventProperties>? properties}) {
+    return Logger.raw(
+      filter: filter.clone(),
+      printer: printer.clone(),
+      output: output.clone(),
       eventHooks: eventHooks,
       outputHooks: outputHooks,
+      defaultProperties: properties ?? defaultProperties,
     );
   }
-}
-
-class _ChildLogger extends Logger {
-  _ChildLogger({
-    required super.filter,
-    required super.printer,
-    required super.output,
-    required super.eventHooks,
-    required super.outputHooks,
-  });
-
-  @override
-  Future<void> init() async {}
-
-  @override
-  Future<void> destroy() async {}
 }

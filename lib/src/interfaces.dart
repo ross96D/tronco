@@ -1,3 +1,4 @@
+import 'package:tronco/src/count.dart';
 import 'package:tronco/src/types.dart';
 
 /// An abstract handler of log events.
@@ -5,10 +6,7 @@ import 'package:tronco/src/types.dart';
 /// A log printer creates and formats the output, which is then sent to
 /// [LogOutput]. Every implementation has to use the [LogPrinter.log]
 /// method to send the output.
-abstract class LogPrinter {
-  Future<void> init() async {}
-  Future<void> destroy() async {}
-
+abstract class LogPrinter extends Disposable {
   /// Is called every time a new [LogEvent] is sent and handles printing
   ///
   /// Returns the lines to be printed
@@ -20,18 +18,12 @@ abstract class LogPrinter {
 ///
 /// This can be an output stream, a file or a network target. [LogOutput] may
 /// cache multiple log messages.
-abstract class LogOutput {
-  Future<void> init() async {}
-  Future<void> destroy() async {}
-
+abstract class LogOutput extends Disposable {
   void output(OutputEvent event);
 }
 
 /// An abstract filter of log messages.
-abstract class LogFilter {
-  Future<void> init() async {}
-  Future<void> destroy() async {}
-
+abstract class LogFilter extends Disposable {
   /// Is called every time a new log message is sent and decides if
   /// it will be printed or canceled.
   ///

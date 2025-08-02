@@ -21,7 +21,7 @@ enum Level {
 
 class LogEvent {
   final Level level;
-  final Iterable<LogEventProperties> properties;
+  final List<LogEventProperties> properties;
   final String message;
   final Object? error;
   final StackTrace? stackTrace;
@@ -50,16 +50,30 @@ class OutputEvent {
   const OutputEvent(this.origin, this.lines);
 }
 
-sealed class LogEventProperties {
+abstract class LogEventProperties {
   const LogEventProperties();
+
+  String print();
 }
 
 class StringProperty extends LogEventProperties{
   final String value;
   const StringProperty(this.value);
+
+  @override
+  String toString() => value;
+
+  @override
+  String print() => toString();
 }
 
-class MapProperty extends LogEventProperties {
-  final Map<String, dynamic> value;
-  const MapProperty(this.value);
+class EntryProperty extends LogEventProperties {
+  final (String, String) value;
+  const EntryProperty(String key, String value): value = (key, value);
+
+  @override
+  String toString() => "${value.$1}: ${value.$2}";
+
+  @override
+  String print() => toString();
 }
